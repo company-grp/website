@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cormorant+Garamond:wght@700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;width:100%;overflow:hidden;background:#000;}
+  *{box-sizing:border-box;}
+  canvas{display:block;}
+  @keyframes aon-breathe{0%,100%{opacity:.74}50%{opacity:1}}
+  ::selection{background:transparent;}
+  ::-moz-selection{background:transparent;}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:fixed;inset:0;overflow:hidden;background:#000;cursor:none;">
+  <canvas ref="{{ canvasRef }}" style="position:absolute;left:0;top:0;width:100%;height:100%;display:block;"></canvas>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+    <span ref="{{ titlePulseRef }}" style="position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 70%);transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none;"></span>
+    <h1 ref="{{ textRef }}" onClick="{{ titleClick }}" style="margin:0;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:400;letter-spacing:0.14em;color:#fff;font-size:clamp(1.9rem,6vw,4.7rem);line-height:1;pointer-events:auto;cursor:none;transition:filter .4s ease,opacity .4s ease;">All or Nothing</h1>
+  </div>
+  <button onClick="{{ toggle }}" ref="{{ soundBtnRef }}" style="position:absolute;right:24px;top:22px;display:flex;align-items:center;gap:10px;background:none;border:none;cursor:none;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-size:11.5px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.58);padding:7px 4px;">
+    <span ref="{{ soundDotRef }}" style="{{ dotStyle }}"></span>
+    <span>{{ soundLabel }}</span>
+  </button>
+  <button onClick="{{ sebClick }}" aria-label="Sebrani" ref="{{ sebBtnRef }}" style="position:absolute;right:24px;bottom:22px;display:flex;align-items:center;justify-content:flex-end;background:none;border:none;outline:none;cursor:none;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-size:11.5px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.58);padding:7px 4px;">
+    <span ref="{{ pulseRef }}" style="position:absolute;right:9px;bottom:11px;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0) 70%);transform:translate(50%,50%) scale(0);opacity:0;pointer-events:none;"></span>
+    <span ref="{{ sebTextRef }}" style="display:inline-block;white-space:nowrap;transition:filter .4s ease,opacity .4s ease;">SEBRANI</span>
+  </button>
+  <div style="position:absolute;left:24px;bottom:22px;display:flex;align-items:center;gap:12px;">
+    <button onClick="{{ companyClick }}" ref="{{ companyRef }}" aria-label="Company Group" style="position:relative;display:flex;align-items:center;justify-content:flex-start;background:none;border:none;outline:none;cursor:none;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-size:11.5px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.58);padding:7px 4px;">
+      <span ref="{{ companyPulseRef }}" style="position:absolute;left:9px;bottom:11px;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0) 70%);transform:translate(-50%,50%) scale(0);opacity:0;pointer-events:none;"></span>
+      <span ref="{{ companyTextRef }}" style="display:inline-block;white-space:nowrap;">Company Group</span>
+    </button>
+    <a ref="{{ linkedinRef }}" onClick="{{ linkedinClick }}" href="https://www.linkedin.com/company/groupcompany" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" style="display:flex;align-items:center;justify-content:center;cursor:none;color:rgba(255,255,255,0.58);padding:7px 4px;line-height:0;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"></path></svg>
+    </a>
+  </div>
+  <div ref="{{ ringRef }}" style="position:absolute;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;border:1px solid rgba(255,255,255,0.42);border-radius:50%;pointer-events:none;transition:width .22s ease,height .22s ease,margin .22s ease,opacity .22s ease;will-change:transform;"></div>
+  <div ref="{{ dotRef }}" style="position:absolute;left:0;top:0;width:6px;height:6px;margin:-3px 0 0 -3px;background:#fff;border-radius:50%;pointer-events:none;will-change:transform;transition:opacity .35s ease;"></div>
+  <div ref="{{ gaugeRef }}" style="position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .15s ease;will-change:transform;">
+    <div style="position:absolute;left:22px;top:-50px;width:2px;height:100px;background:rgba(255,255,255,0.16);">
+      <div ref="{{ gaugeFillRef }}" style="position:absolute;left:0;bottom:0;width:2px;height:0px;background:#fff;"></div>
+    </div>
+  </div>
+  <div ref="{{ loaderRef }}" style="position:absolute;inset:0;z-index:60;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .42s ease;">
+    <div ref="{{ loaderLineRef }}" style="height:1px;width:0;background:#fff;box-shadow:0 0 12px rgba(255,255,255,0.4);opacity:0;transition:width .62s cubic-bezier(.16,1,.3,1),opacity .4s ease;"></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { soundOn: true };
+  volume = 0.55;
+  _animOn = false;
+  _reveal = 0;
+  _revealTarget = 0;
+
+  rootRef = (el) => { this.root = el; };
+  canvasRef = (el) => { this.canvas = el; };
+  dotRef = (el) => { this.dot = el; };
+  ringRef = (el) => { this.ring = el; };
+  gaugeRef = (el) => { this.gauge = el; };
+  gaugeFillRef = (el) => { this.gaugeFill = el; };
+  textRef = (el) => { this.text = el; };
+  sebTextRef = (el) => { this.sebText = el; };
+  pulseRef = (el) => { this.pulse = el; };
+  soundBtnRef = (el) => { this.soundBtn = el; };
+  sebBtnRef = (el) => { this.sebBtn = el; };
+  companyRef = (el) => { this.company = el; };
+  linkedinRef = (el) => { this.linkedin = el; };
+  soundDotRef = (el) => { this.soundDot = el; };
+  companyPulseRef = (el) => { this.companyPulse = el; };
+  companyTextRef = (el) => { this.companyText = el; };
+  loaderRef = (el) => { this.loader = el; };
+  loaderLineRef = (el) => { this.loaderLine = el; };
+  titlePulseRef = (el) => { this.titlePulse = el; };
+
+  componentDidMount() { this._initColors(); this._init(); this._runIntro(); }
+
+  _runIntro() {
+    if (this._introDone) return;
+    this._introDone = true;
+    this._introActive = true;
+    const loader = this.loader, line = this.loaderLine;
+    if (!loader) { this._introActive = false; this._startIdle(); return; }
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hide = () => { loader.style.opacity = '0'; this._introT3 = setTimeout(() => { loader.style.visibility = 'hidden'; loader.style.pointerEvents = 'none'; this._introActive = false; this._startIdle(); }, 440); };
+    if (reduce) { this._introT2 = setTimeout(hide, 120); return; }
+    const w = Math.max(170, Math.min(360, window.innerWidth * 0.32));
+    requestAnimationFrame(() => { if (line) { line.style.opacity = '1'; line.style.width = w + 'px'; } });
+    this._introT1 = setTimeout(() => { if (line) line.style.opacity = '0'; }, 820);
+    this._introT2 = setTimeout(hide, 900);
+  }
+
+  COMBOS = [
+    { text: "#ffe04a", background: "#5776fb" },
+    { text: "#ffcac6", background: "#00410f" },
+    { text: "#21c162", background: "#172828" },
+    { text: "#4ee889", background: "#112036" },
+    { text: "#ebf6fc", background: "#5c32f7" },
+    { text: "#d3d4a9", background: "#17200a" },
+    { text: "#eef1f2", background: "#1a1e21" },
+    { text: "#e4badb", background: "#17200a" },
+    { text: "#1ef4dd", background: "#17200a" },
+    { text: "#e64b8a", background: "#edd8f1" },
+    { text: "#f3f5f3", background: "#85efc6" },
+    { text: "#231e17", background: "#faddc2" },
+    { text: "#de05a6", background: "#fbfbf9" },
+    { text: "#e52c0a", background: "#1f1f1d" },
+    { text: "#de05a6", background: "#020000" },
+    { text: "#e52c0a", background: "#fefff5" },
+    { text: "#ffcc87", background: "#525294" },
+    { text: "#98da1d", background: "#335445" },
+    { text: "#ffcc87", background: "#482929" },
+    { text: "#ffcc87", background: "#d43930" },
+    { text: "#ffcc87", background: "#ee1c25" },
+    { text: "#c81adf", background: "#000034" },
+    { text: "#1188dc", background: "#eb4a55" },
+    { text: "#98da1d", background: "#000001" },
+    { text: "#df1199", background: "#2c57ff" },
+    { text: "#10f8de", background: "#8638fc" },
+    { text: "#2bf29d", background: "#1a2225" },
+    { text: "#2bf29d", background: "#1e1846" },
+    { text: "#2bf29d", background: "#3e1738" },
+    { text: "#FFFFFF", background: "#000000" },
+    { text: "#fc9370", background: "#10100f" },
+    { text: "#c7b048", background: "#24241e" },
+    { text: "#ffffff", background: "#161514" },
+    { text: "#000000", background: "#FFFFFF" },
+    { text: "#003ac4", background: "#FFFFFF" },
+    { text: "#ffffff", background: "#f6132f" }
+  ];
+
+  _hex(h) {
+    h = h.replace('#', '');
+    if (h.length === 3) h = h.split('').map(x => x + x).join('');
+    return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+  }
+
+  _initColors() {
+    let i = this.COMBOS.findIndex(c => c.background.toLowerCase() === '#000000' && c.text.toUpperCase() === '#FFFFFF');
+    if (i < 0) i = 0;
+    this.activeCombo = i;
+    const c = this.COMBOS[i];
+    this._bgTarget = this._hex(c.background);
+    this._txTarget = this._hex(c.text);
+    this._bg = { ...this._bgTarget };
+    this._tx = { ...this._txTarget };
+    if (this.root) {
+      this.root.style.setProperty('--bg', c.background);
+      this.root.style.setProperty('--accent', c.text);
+    }
+    this._resetComboTimer();
+  }
+
+  _applyCombo(i) {
+    this.activeCombo = i;
+    const c = this.COMBOS[i];
+    this._bgTarget = this._hex(c.background);
+    this._txTarget = this._hex(c.text);
+    if (this.root) {
+      this.root.style.setProperty('--bg', c.background);
+      this.root.style.setProperty('--accent', c.text);
+    }
+  }
+
+  _nextCombo = () => {
+    if (!this.COMBOS) return;
+    let i;
+    do { i = Math.floor(Math.random() * this.COMBOS.length); }
+    while (i === this.activeCombo && this.COMBOS.length > 1);
+    this._applyCombo(i);
+    this._resetComboTimer();
+  };
+
+  _resetComboTimer() {
+    clearTimeout(this._comboTimer);
+    this._comboTimer = setTimeout(this._nextCombo, 15000);
+  }
+
+
+  _init() {
+    const root = this.root, canvas = this.canvas;
+    if (!root || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    const noise = this._makeNoise(2027);
+
+    let W = 0, H = 0, dpr = 1;
+    const cell = 30, NS = 0.15, TS = 0.16, SPEED = 11, RC = 220;
+    let cols = 0, rows = 0, psi, velx, vely, particles = null;
+    const mouse = { x: 0, y: 0 }, ring = { x: 0, y: 0 };
+    const txt = { hx: 0, hy: 0, rx: 160, ry: 80, ox: 0, oy: 0, vx: 0, vy: 0 };
+    const explosions = [];
+
+    const resize = () => {
+      W = root.clientWidth || window.innerWidth;
+      H = root.clientHeight || window.innerHeight;
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.ceil(W / cell) + 2;
+      rows = Math.ceil(H / cell) + 2;
+      this._revealOrigin = { x: 38, y: H - 28 };
+      this._revealMax = Math.hypot(W, H) + 120;
+      psi = new Float32Array(cols * rows);
+      velx = new Float32Array(cols * rows);
+      vely = new Float32Array(cols * rows);
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+      if (!particles) {
+        const n = Math.min(2800, Math.max(900, Math.floor(W * H / 620)));
+        particles = new Array(n);
+        for (let i = 0; i < n; i++) particles[i] = {
+          x: Math.random() * W, y: Math.random() * H,
+          br: 0.16 + Math.random() * 0.5,
+          sp: 0.55 + Math.random() * 1.0,
+          sz: 0.8 + Math.random() * 0.9,
+        };
+        mouse.x = W / 2; mouse.y = H / 2; ring.x = W / 2; ring.y = H / 2;
+      }
+      measure();
+    };
+    const measure = () => {
+      txt.hx = W / 2; txt.hy = H / 2;
+      if (this.text) {
+        const r = this.text.getBoundingClientRect();
+        txt.rx = r.width / 2 + 78;
+        txt.ry = r.height / 2 + 66;
+      }
+    };
+    resize();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    this._ro = new ResizeObserver(resize); this._ro.observe(root);
+
+    const setMouse = (x, y) => { mouse.x = x; mouse.y = y; };
+    this._mouse = mouse;
+    this._onMove = (e) => {
+      setMouse(e.clientX, e.clientY);
+      if (this._drag) {
+        const dv = (this._dragY - e.clientY) * 0.0045;
+        this.volume = Math.max(0, Math.min(1, this._dragVol + dv));
+        this._applyVol(this.state.soundOn, true);
+        this._updGauge();
+      }
+    };
+    this._onDown = (e) => {
+      if (this.state.soundOn && !this.audio) { this._initAudio(); this._applyVol(true, false); }
+      if (this._dvd || this._dvdEntering) return; // waking click only wakes; no explosion
+      if (e.target && e.target.closest && e.target.closest('button, h1, a')) return;
+      if (e.button === 2) {
+        // right-click hold → volume control
+        this._drag = true; this._dragY = e.clientY; this._dragVol = this.volume;
+        if (this.gauge) this.gauge.style.opacity = '1';
+        if (this.ring) { this.ring.style.width = '15px'; this.ring.style.height = '15px'; this.ring.style.margin = '-7.5px 0 0 -7.5px'; }
+        this._updGauge();
+        return;
+      }
+      if (e.button !== 0) return;
+      // left-click → explosion + colour change
+      if (explosions.length > 6) explosions.shift();
+      explosions.push({ x: e.clientX, y: e.clientY, r: 0, speed: 13, power: 26, life: 1.35, age: 0 });
+      this._clickSound();
+      this._resetComboTimer();
+      const inText = Math.hypot((e.clientX - txt.hx) / txt.rx, (e.clientY - txt.hy) / txt.ry) < 1;
+      if (!inText) this._nextCombo();
+    };
+    this._onUp = () => {
+      this._drag = false;
+      if (this.gauge) this.gauge.style.opacity = '0';
+      if (this.ring) { this.ring.style.width = '30px'; this.ring.style.height = '30px'; this.ring.style.margin = '-15px 0 0 -15px'; }
+    };
+    this._onTouch = (e) => { if (e.touches[0]) setMouse(e.touches[0].clientX, e.touches[0].clientY); };
+    this._onCtx = (e) => {
+      e.preventDefault(); // suppress menu; right-click is the volume control
+    };
+    window.addEventListener('pointermove', this._onMove);
+    window.addEventListener('pointerdown', this._onDown);
+    window.addEventListener('pointerup', this._onUp);
+    window.addEventListener('touchmove', this._onTouch, { passive: true });
+    root.addEventListener('contextmenu', this._onCtx);
+    // user-activity for the idle easter egg
+    window.addEventListener('pointermove', this._onIdleMove, { passive: true });
+    window.addEventListener('pointerdown', this._onActivity, { passive: true });
+    window.addEventListener('touchstart', this._onActivity, { passive: true });
+    window.addEventListener('keydown', this._onActivity);
+    window.addEventListener('wheel', this._onActivity, { passive: true });
+
+    this._updGauge = () => { if (this.gaugeFill) this.gaugeFill.style.height = (this.volume * 100) + 'px'; };
+    this._updGauge();
+
+    let last = performance.now(), start = last;
+    const loop = () => {
+      this._raf = requestAnimationFrame(loop);
+      const now = performance.now();
+      let dt = (now - last) / 1000; last = now; if (dt > 0.05) dt = 0.05;
+      const dtf = dt * 60, t = (now - start) / 1000;
+
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) psi[i + j * cols] = noise(i * NS, j * NS, t * TS);
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        const i0 = i > 0 ? i - 1 : 0, i1 = i < cols - 1 ? i + 1 : cols - 1;
+        const j0 = j > 0 ? j - 1 : 0, j1 = j < rows - 1 ? j + 1 : rows - 1;
+        const idx = i + j * cols;
+        velx[idx] = (psi[i + j1 * cols] - psi[i + j0 * cols]) * SPEED;
+        vely[idx] = -(psi[i1 + j * cols] - psi[i0 + j * cols]) * SPEED;
+      }
+
+      ring.x += (mouse.x - ring.x) * 0.18; ring.y += (mouse.y - ring.y) * 0.18;
+
+      // text stays fixed; animations keep clear of its area (static ellipse)
+      const ecx = txt.hx, ecy = txt.hy;
+
+      // advance explosions
+      for (let e = explosions.length - 1; e >= 0; e--) {
+        const ex = explosions[e];
+        ex.r += ex.speed * dtf;
+        ex.power *= Math.pow(0.965, dtf);
+        ex.age += dt;
+        if (ex.age >= ex.life) explosions.splice(e, 1);
+      }
+
+      // smoothly lerp canvas colours toward the active combo
+      const lf = Math.min(1, 0.06 * dtf);
+      const bg = this._bg, txc = this._tx, bgt = this._bgTarget, txt2 = this._txTarget;
+      bg.r += (bgt.r - bg.r) * lf; bg.g += (bgt.g - bg.g) * lf; bg.b += (bgt.b - bg.b) * lf;
+      txc.r += (txt2.r - txc.r) * lf; txc.g += (txt2.g - txc.g) * lf; txc.b += (txt2.b - txc.b) * lf;
+
+      // reveal spread: animation grows/recedes from the Company Group corner
+      this._reveal += (this._revealTarget - this._reveal) * Math.min(1, 0.04 * dtf);
+      const rev = this._reveal, revFeather = 150;
+      const rOx = (this._revealOrigin && this._revealOrigin.x) || 38;
+      const rOy = (this._revealOrigin && this._revealOrigin.y) || (H - 28);
+
+      ctx.globalCompositeOperation = 'source-over';
+      let fadeA;
+      if (rev <= 0.5) fadeA = 1;          // fully off → pristine, no imprint
+      else if (!this._animOn) fadeA = 0.4; // receding → clear fast so nothing lingers
+      else fadeA = 0.12;                    // active → soft trails
+      ctx.fillStyle = `rgba(${bg.r | 0},${bg.g | 0},${bg.b | 0},${fadeA})`;
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = `rgb(${txc.r | 0},${txc.g | 0},${txc.b | 0})`;
+      const mx = mouse.x, my = mouse.y;
+      for (let k = 0; k < particles.length; k++) {
+        const p = particles[k];
+        let gx = p.x / cell, gy = p.y / cell;
+        let ci = gx | 0, cj = gy | 0;
+        if (ci < 0) ci = 0; else if (ci > cols - 2) ci = cols - 2;
+        if (cj < 0) cj = 0; else if (cj > rows - 2) cj = rows - 2;
+        const fx = gx - ci, fy = gy - cj, a = ci + cj * cols;
+        let vx = ((velx[a] * (1 - fx) + velx[a + 1] * fx) * (1 - fy) + (velx[a + cols] * (1 - fx) + velx[a + cols + 1] * fx) * fy) * p.sp;
+        let vy = ((vely[a] * (1 - fx) + vely[a + 1] * fx) * (1 - fy) + (vely[a + cols] * (1 - fx) + vely[a + cols + 1] * fx) * fy) * p.sp;
+        const dx = p.x - mx, dy = p.y - my, d2 = dx * dx + dy * dy;
+        if (d2 < RC * RC) {
+          const d = Math.sqrt(d2) || 0.001, f = 1 - d / RC, fm = f * f;
+          const rx = dx / d, ry = dy / d;
+          vx += (rx * 1.15 - ry * 1.85) * fm * 9.5;
+          vy += (ry * 1.15 + rx * 1.85) * fm * 9.5;
+        }
+        // keep clear-space around the text: push particles out of its ellipse
+        const pex = p.x - ecx, pey = p.y - ecy;
+        const pnd = Math.hypot(pex / txt.rx, pey / txt.ry);
+        if (pnd < 1) {
+          const len = Math.hypot(pex, pey) || 0.001;
+          const f = (1 - pnd);
+          vx += (pex / len) * f * 7;
+          vy += (pey / len) * f * 7;
+        }
+        // explosion shockwaves
+        for (let e = 0; e < explosions.length; e++) {
+          const ex = explosions[e];
+          const exd = p.x - ex.x, eyd = p.y - ex.y;
+          const ed = Math.hypot(exd, eyd) || 0.001;
+          const band = Math.abs(ed - ex.r);
+          if (band < 95) {
+            const f = (1 - band / 95) * ex.power;
+            vx += (exd / ed) * f;
+            vy += (eyd / ed) * f;
+          }
+        }
+        p.x += vx * dtf; p.y += vy * dtf;
+        if (p.x < -2) p.x += W + 4; else if (p.x > W + 2) p.x -= W + 4;
+        if (p.y < -2) p.y += H + 4; else if (p.y > H + 2) p.y -= H + 4;
+        const sp = Math.sqrt(vx * vx + vy * vy);
+        let mask = rev <= 0.5 ? 0 : (rev - Math.hypot(p.x - rOx, p.y - rOy)) / revFeather;
+        if (mask > 1) mask = 1; else if (mask < 0) mask = 0;
+        if (mask > 0.004) {
+          ctx.globalAlpha = Math.min(0.95, p.br * (0.5 + Math.min(1.5, sp / 3))) * mask;
+          ctx.fillRect(p.x, p.y, p.sz, p.sz);
+        }
+      }
+      // explosion rings + core flash
+      for (let e = 0; e < explosions.length; e++) {
+        const ex = explosions[e];
+        const fade = Math.max(0, 1 - ex.age / ex.life);
+        const tcss = `${txc.r | 0},${txc.g | 0},${txc.b | 0}`;
+        ctx.strokeStyle = `rgb(${tcss})`;
+        ctx.lineWidth = 1.5;
+        // several concentric rings rippling outward behind the leading edge
+        const ringDefs = [[0, 0.5], [38, 0.34], [78, 0.22], [122, 0.14], [170, 0.08]];
+        for (let ri = 0; ri < ringDefs.length; ri++) {
+          const rr = ex.r - ringDefs[ri][0];
+          if (rr <= 1) continue;
+          ctx.globalAlpha = fade * ringDefs[ri][1];
+          ctx.beginPath(); ctx.arc(ex.x, ex.y, rr, 0, Math.PI * 2); ctx.stroke();
+        }
+        if (ex.age < 0.22) {
+          const cr = 70 * (1 - ex.age / 0.22);
+          const grd = ctx.createRadialGradient(ex.x, ex.y, 0, ex.x, ex.y, cr + 1);
+          grd.addColorStop(0, `rgba(${tcss},${0.6 * (1 - ex.age / 0.22)})`);
+          grd.addColorStop(1, `rgba(${tcss},0)`);
+          ctx.globalAlpha = 1; ctx.fillStyle = grd;
+          ctx.beginPath(); ctx.arc(ex.x, ex.y, cr + 1, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = `rgb(${tcss})`;
+        }
+      }
+      ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+
+      if (this.dot) this.dot.style.transform = `translate(${mx}px,${my}px)`;
+      if (this.ring) this.ring.style.transform = `translate(${ring.x}px,${ring.y}px)`;
+      if (this.gauge) this.gauge.style.transform = `translate(${mx}px,${my}px)`;
+      // hide the custom cursor while the bounce easter egg is active,
+      // but reveal it briefly if the mouse has moved within the last 15s
+      let cursorHidden = this._dvd || this._dvdEntering;
+      if (cursorHidden && this._lastMove && (now - this._lastMove) < 15000) cursorHidden = false;
+      if (this.dot) this.dot.style.opacity = cursorHidden ? '0' : '1';
+      if (this.ring) this.ring.style.opacity = cursorHidden ? '0' : '1';
+
+      // drive UI/text colours from the lerped accent (smooth, no var-transition quirks)
+      const tr = txc.r | 0, tg = txc.g | 0, tb = txc.b | 0;
+      const txCss = `rgb(${tr},${tg},${tb})`;
+      const txDim = `rgba(${tr},${tg},${tb},0.6)`;
+
+      // idle "bouncing" easter egg — move "Company" at constant diagonal speed
+      if (this._dvd && this.text) {
+        const halfW = this.text.offsetWidth / 2, halfH = this.text.offsetHeight / 2;
+        const margin = 26;
+        const maxX = Math.max(0, W / 2 - halfW - margin);
+        const maxY = Math.max(0, H / 2 - halfH - margin);
+        this._dx = (this._dx || 0) + this._dvx * dt;
+        this._dy = (this._dy || 0) + this._dvy * dt;
+        let hit = false;
+        if (this._dx > maxX) { this._dx = maxX; this._dvx = -Math.abs(this._dvx); hit = true; }
+        else if (this._dx < -maxX) { this._dx = -maxX; this._dvx = Math.abs(this._dvx); hit = true; }
+        if (this._dy > maxY) { this._dy = maxY; this._dvy = -Math.abs(this._dvy); hit = true; }
+        else if (this._dy < -maxY) { this._dy = -maxY; this._dvy = Math.abs(this._dvy); hit = true; }
+        if (hit) this._dvdColorIdx = (this._dvdColorIdx + 1) % this.DVD_COLORS.length;
+        this.text.style.transform = `translate(${this._dx}px,${this._dy}px)`;
+        this.text.style.color = this.DVD_COLORS[this._dvdColorIdx];
+      } else if (this.text) {
+        this.text.style.color = txCss;
+      }
+      if (this.root) this.root.style.background = `rgb(${bg.r | 0},${bg.g | 0},${bg.b | 0})`;
+      // cursor matches the DVD bounce colour while that effect is active, else the accent
+      const curCss = (this._dvd && this.DVD_COLORS) ? this.DVD_COLORS[this._dvdColorIdx] : txCss;
+      const curRgb = this._hex(curCss.indexOf('#') === 0 ? curCss : `#${tr.toString(16).padStart(2,'0')}${tg.toString(16).padStart(2,'0')}${tb.toString(16).padStart(2,'0')}`);
+      if (this.dot) this.dot.style.background = curCss;
+      if (this.ring) this.ring.style.borderColor = `rgba(${curRgb.r},${curRgb.g},${curRgb.b},0.42)`;
+      if (this.gaugeFill) this.gaugeFill.style.background = txCss;
+      if (this.company) this.company.style.color = txDim;
+      if (this.linkedin) this.linkedin.style.color = txDim;
+      if (this.soundBtn) {
+        let g = 0;
+        if (this._soundFlash) {
+          const sf = (now - this._soundFlash) / 750;
+          if (sf >= 1) this._soundFlash = 0;
+          else g = Math.sin(sf * Math.PI);
+        }
+        this.soundBtn.style.color = `rgba(${tr},${tg},${tb},${0.6 + g * 0.4})`;
+        this.soundBtn.style.textShadow = g > 0.01 ? `0 0 ${14 * g}px rgba(${tr},${tg},${tb},${0.7 * g})` : 'none';
+      }
+      if (this.sebBtn) this.sebBtn.style.color = txDim;
+      // occasional soft radiance hinting these two are clickable
+      const glowAt = (phase) => {
+        const c = (t + phase) % 7.5;
+        if (c > 1.7) return 0;
+        return Math.sin((c / 1.7) * Math.PI); // 0→1→0 bump
+      };
+      if (this.company) {
+        let g = glowAt(0);
+        // brief radiance burst when clicked
+        if (this._companyFlash) {
+          const cf = (now - this._companyFlash) / 750;
+          if (cf >= 1) this._companyFlash = 0;
+          else g = Math.max(g, Math.sin(cf * Math.PI));
+        }
+        this.company.style.color = `rgba(${tr},${tg},${tb},${0.6 + g * 0.4})`;
+        this.company.style.textShadow = g > 0.01 ? `0 0 ${14 * g}px rgba(${tr},${tg},${tb},${0.7 * g})` : 'none';
+      }
+      if (this.sebBtn) {
+        const g = glowAt(3.75);
+        this.sebBtn.style.color = `rgba(${tr},${tg},${tb},${0.6 + g * 0.4})`;
+        this.sebBtn.style.textShadow = g > 0.01 ? `0 0 ${10 * g}px rgba(${tr},${tg},${tb},${0.55 * g})` : 'none';
+      }
+      if (this.pulse) this.pulse.style.background = `radial-gradient(circle, rgba(${tr},${tg},${tb},0.6) 0%, rgba(${tr},${tg},${tb},0) 70%)`;
+      if (this.companyPulse) this.companyPulse.style.background = `radial-gradient(circle, rgba(${tr},${tg},${tb},0.6) 0%, rgba(${tr},${tg},${tb},0) 70%)`;
+      if (this.titlePulse) this.titlePulse.style.background = `radial-gradient(circle, rgba(${tr},${tg},${tb},0.55) 0%, rgba(${tr},${tg},${tb},0) 70%)`;
+      if (this.soundDot) {
+        if (this.state.soundOn) { this.soundDot.style.background = txCss; this.soundDot.style.border = 'none'; }
+        else { this.soundDot.style.background = 'transparent'; this.soundDot.style.border = `1px solid rgba(${tr},${tg},${tb},0.45)`; }
+      }
+    };
+    loop();
+  }
+
+  _makeNoise(seed) {
+    const p = new Uint8Array(256);
+    for (let i = 0; i < 256; i++) p[i] = i;
+    let s = seed >>> 0;
+    for (let i = 255; i > 0; i--) { s = (s * 16807 + 17) % 2147483647; const j = s % (i + 1); const q = p[i]; p[i] = p[j]; p[j] = q; }
+    const perm = new Uint8Array(512), pm = new Uint8Array(512);
+    for (let i = 0; i < 512; i++) { perm[i] = p[i & 255]; pm[i] = perm[i] % 12; }
+    const g = new Float32Array([1,1,0,-1,1,0,1,-1,0,-1,-1,0,1,0,1,-1,0,1,1,0,-1,-1,0,-1,0,1,1,0,-1,1,0,1,-1,0,-1,-1]);
+    const F3 = 1 / 3, G3 = 1 / 6;
+    return function (xin, yin, zin) {
+      let n0, n1, n2, n3;
+      const sk = (xin + yin + zin) * F3;
+      const i = Math.floor(xin + sk), j = Math.floor(yin + sk), k = Math.floor(zin + sk);
+      const tk = (i + j + k) * G3;
+      const x0 = xin - (i - tk), y0 = yin - (j - tk), z0 = zin - (k - tk);
+      let i1, j1, k1, i2, j2, k2;
+      if (x0 >= y0) {
+        if (y0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=1;k2=0; }
+        else if (x0 >= z0) { i1=1;j1=0;k1=0;i2=1;j2=0;k2=1; }
+        else { i1=0;j1=0;k1=1;i2=1;j2=0;k2=1; }
+      } else {
+        if (y0 < z0) { i1=0;j1=0;k1=1;i2=0;j2=1;k2=1; }
+        else if (x0 < z0) { i1=0;j1=1;k1=0;i2=0;j2=1;k2=1; }
+        else { i1=0;j1=1;k1=0;i2=1;j2=1;k2=0; }
+      }
+      const x1=x0-i1+G3, y1=y0-j1+G3, z1=z0-k1+G3;
+      const x2=x0-i2+2*G3, y2=y0-j2+2*G3, z2=z0-k2+2*G3;
+      const x3=x0-1+3*G3, y3=y0-1+3*G3, z3=z0-1+3*G3;
+      const ii=i&255, jj=j&255, kk=k&255;
+      let t0=0.6-x0*x0-y0*y0-z0*z0;
+      if (t0<0) n0=0; else { const gi=pm[ii+perm[jj+perm[kk]]]*3; t0*=t0; n0=t0*t0*(g[gi]*x0+g[gi+1]*y0+g[gi+2]*z0); }
+      let t1=0.6-x1*x1-y1*y1-z1*z1;
+      if (t1<0) n1=0; else { const gi=pm[ii+i1+perm[jj+j1+perm[kk+k1]]]*3; t1*=t1; n1=t1*t1*(g[gi]*x1+g[gi+1]*y1+g[gi+2]*z1); }
+      let t2=0.6-x2*x2-y2*y2-z2*z2;
+      if (t2<0) n2=0; else { const gi=pm[ii+i2+perm[jj+j2+perm[kk+k2]]]*3; t2*=t2; n2=t2*t2*(g[gi]*x2+g[gi+1]*y2+g[gi+2]*z2); }
+      let t3=0.6-x3*x3-y3*y3-z3*z3;
+      if (t3<0) n3=0; else { const gi=pm[ii+1+perm[jj+1+perm[kk+1]]]*3; t3*=t3; n3=t3*t3*(g[gi]*x3+g[gi+1]*y3+g[gi+2]*z3); }
+      return 32 * (n0 + n1 + n2 + n3);
+    };
+  }
+
+  _impulse(ctx, dur, decay) {
+    const rate = ctx.sampleRate, len = rate * dur;
+    const buf = ctx.createBuffer(2, len, rate);
+    for (let ch = 0; ch < 2; ch++) { const d = buf.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
+    return buf;
+  }
+
+  _initAudio() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+    const conv = ctx.createConvolver(); conv.buffer = this._impulse(ctx, 5.0, 3.2);
+    const wet = ctx.createGain(); wet.gain.value = 0.6; conv.connect(wet); wet.connect(master);
+    const dry = ctx.createGain(); dry.gain.value = 0.62; dry.connect(master);
+    const filt = ctx.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 900; filt.Q.value = 0.9;
+    filt.connect(dry); filt.connect(conv);
+    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.025;
+    const lfoG = ctx.createGain(); lfoG.gain.value = 380; lfo.connect(lfoG); lfoG.connect(filt.frequency); lfo.start();
+    const oscs = [lfo];
+    const freqs = [110, 164.81, 220, 293.66], amps = [0.6, 0.42, 0.32, 0.2];
+    freqs.forEach((f, i) => {
+      [-4, 5].forEach((det) => {
+        const o = ctx.createOscillator(); o.type = i % 2 ? 'triangle' : 'sine';
+        o.frequency.value = f; o.detune.value = det;
+        const gg = ctx.createGain(); gg.gain.value = amps[i] * 0.5;
+        const al = ctx.createOscillator(); al.frequency.value = 0.02 + i * 0.013;
+        const alG = ctx.createGain(); alG.gain.value = amps[i] * 0.28;
+        al.connect(alG); alG.connect(gg.gain); al.start();
+        o.connect(gg); gg.connect(filt); o.start();
+        oscs.push(o, al);
+      });
+    });
+    const sh = ctx.createOscillator(); sh.type = 'sine'; sh.frequency.value = 659.25;
+    const shg = ctx.createGain(); shg.gain.value = 0.0;
+    const shl = ctx.createOscillator(); shl.frequency.value = 0.05;
+    const shlg = ctx.createGain(); shlg.gain.value = 0.028;
+    shl.connect(shlg); shlg.connect(shg.gain); shl.start();
+    sh.connect(shg); shg.connect(conv); sh.start();
+    oscs.push(sh, shl);
+    this.audio = { ctx, master, oscs, conv };
+  }
+
+  _applyVol(on, quick) {
+    if (!this.audio) return;
+    const { ctx, master } = this.audio;
+    if (ctx.state === 'suspended') ctx.resume();
+    const target = on ? this.volume * 0.34 : 0;
+    const now = ctx.currentTime;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setValueAtTime(master.gain.value, now);
+    master.gain.linearRampToValueAtTime(target, now + (quick ? 0.05 : 1.4));
+  }
+
+  _clickSound() {
+    if (!this.state.soundOn || !this.audio) return;
+    const { ctx, conv } = this.audio;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const vol = this.volume;
+    const out = ctx.createGain(); out.gain.value = 1;
+    out.connect(ctx.destination);
+    if (conv) { const cs = ctx.createGain(); cs.gain.value = 0.6; out.connect(cs); cs.connect(conv); }
+
+    // soft low body that drops, like the impulse of the shockwave
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(150, now);
+    o.frequency.exponentialRampToValueAtTime(70, now + 0.5);
+    const og = ctx.createGain(); og.gain.value = 0;
+    o.connect(og); og.connect(out);
+    og.gain.setValueAtTime(0.0001, now);
+    og.gain.linearRampToValueAtTime(0.075 * vol, now + 0.02);
+    og.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+    o.start(now); o.stop(now + 0.8);
+
+    // airy outward swell tracking the expanding ring (rising bandpass)
+    const len = Math.floor(ctx.sampleRate * 0.9);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const nb = ctx.createBufferSource(); nb.buffer = buf;
+    const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.Q.value = 0.7;
+    nf.frequency.setValueAtTime(700, now);
+    nf.frequency.exponentialRampToValueAtTime(3200, now + 0.5);
+    const ng = ctx.createGain(); ng.gain.value = 0;
+    nb.connect(nf); nf.connect(ng); ng.connect(out);
+    ng.gain.setValueAtTime(0.0001, now);
+    ng.gain.linearRampToValueAtTime(0.04 * vol, now + 0.05);
+    ng.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+    nb.start(now); nb.stop(now + 0.9);
+  }
+
+  _pulseSound() {
+    if (!this.state.soundOn || !this.audio) return;
+    const { ctx, conv } = this.audio;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const vol = this.volume;
+    const out = ctx.createGain(); out.gain.value = 1;
+    out.connect(ctx.destination);
+    if (conv) { const cs = ctx.createGain(); cs.gain.value = 0.5; out.connect(cs); cs.connect(conv); }
+
+    // low breath
+    const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = 168;
+    const og = ctx.createGain(); og.gain.value = 0;
+    o.connect(og); og.connect(out);
+    og.gain.setValueAtTime(0, now);
+    og.gain.linearRampToValueAtTime(0.07 * vol, now + 0.28);
+    og.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
+    o.start(now); o.stop(now + 1.5);
+
+    // distant white shimmer
+    const len = Math.floor(ctx.sampleRate * 1.3);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const nb = ctx.createBufferSource(); nb.buffer = buf;
+    const nf = ctx.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 3200; nf.Q.value = 0.55;
+    const ng = ctx.createGain(); ng.gain.value = 0;
+    nb.connect(nf); nf.connect(ng); ng.connect(out);
+    ng.gain.setValueAtTime(0, now);
+    ng.gain.linearRampToValueAtTime(0.03 * vol, now + 0.16);
+    ng.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+    nb.start(now); nb.stop(now + 1.3);
+  }
+
+  _sebPulse() {
+    if (this.pulse) {
+      try {
+        this.pulse.animate([
+          { transform: 'translate(50%,50%) scale(0.3)', opacity: 0.5 },
+          { transform: 'translate(50%,50%) scale(16)', opacity: 0 },
+        ], { duration: 950, easing: 'cubic-bezier(.22,.61,.36,1)' });
+      } catch (e) {}
+    }
+    this._pulseSound();
+  }
+
+  _doTitleSwap(toAlt, opts) {
+    opts = opts || {};
+    const el = this.text;
+    if (!el) { this._titleBusy = false; return; }
+    if (opts.pulse !== false && this.titlePulse) {
+      try {
+        this.titlePulse.animate([
+          { transform: 'translate(-50%,-50%) scale(0.3)', opacity: 0.5 },
+          { transform: 'translate(-50%,-50%) scale(24)', opacity: 0 },
+        ], { duration: 1150, easing: 'cubic-bezier(.22,.61,.36,1)' });
+      } catch (e) {}
+    }
+    if (opts.sound !== false) this._pulseSound();
+    el.style.transition = 'filter .4s ease, opacity .4s ease';
+    el.style.filter = 'blur(8px)';
+    el.style.opacity = '0';
+    this._titleT1 = setTimeout(() => {
+      if (toAlt) {
+        el.textContent = 'Company';
+        el.style.fontFamily = "'Cormorant Garamond', Georgia, serif";
+        el.style.fontWeight = '700';
+        el.style.letterSpacing = '0.015em';
+        this._titleAlt = true;
+      } else {
+        el.textContent = 'All or Nothing';
+        el.style.fontFamily = "'Space Grotesk', Helvetica, Arial, sans-serif";
+        el.style.fontWeight = '400';
+        el.style.letterSpacing = '0.14em';
+        this._titleAlt = false;
+      }
+      // while invisible, optionally snap position (used when exiting DVD mode)
+      if (opts.resetPos) { this._dx = 0; this._dy = 0; el.style.transform = 'translate(0px,0px)'; }
+      // gentler, longer reveal so the new text eases in gradually (not a sudden pop)
+      el.style.transition = 'filter 1s cubic-bezier(.22,.61,.36,1), opacity 1s cubic-bezier(.22,.61,.36,1)';
+      requestAnimationFrame(() => {
+        el.style.filter = 'blur(0px)';
+        el.style.opacity = '1';
+      });
+      this._titleT2 = setTimeout(() => {
+        this._titleBusy = false;
+        if (opts.done) opts.done();
+      }, 1020);
+    }, 540);
+  }
+
+  titleClick = () => {
+    if (this._titleBusy || this._dvd) return;
+    this._titleBusy = true;
+    if (this.state.soundOn && !this.audio) { this._initAudio(); this._applyVol(true, false); }
+    this._doTitleSwap(!this._titleAlt);
+  };
+
+  // ---------- idle "bouncing" easter egg ----------
+  DVD_COLORS = ['#ff4d4d', '#ffd24d', '#5dff8f', '#4dd2ff', '#c77dff', '#ff7ad9', '#ffffff', '#ff9e4d'];
+
+  _startIdle() {
+    this._idleReady = true;
+    this._resetIdle();
+  }
+
+  _resetIdle() {
+    if (!this._idleReady) return;
+    clearTimeout(this._idleTimer);
+    this._idleTimer = setTimeout(this._enterDvd, 60000);
+  }
+
+  _onActivity = () => {
+    if (this._dvd || this._dvdEntering) this._exitDvd();
+    this._resetIdle();
+  };
+
+  // mouse movement only delays entering DVD; it never wakes an active DVD
+  _onIdleMove = () => {
+    this._lastMove = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    if (this._dvd || this._dvdEntering) return;
+    this._resetIdle();
+  };
+
+  _fadeLabels(hide) {
+    [this.company, this.sebBtn, this.soundBtn, this.linkedin].forEach((el) => {
+      if (!el) return;
+      el.style.transition = 'filter .4s ease, opacity .4s ease';
+      el.style.filter = hide ? 'blur(6px)' : 'blur(0px)';
+      el.style.opacity = hide ? '0' : '1';
+      el.style.pointerEvents = hide ? 'none' : '';
+    });
+    this._pulseSound();
+  }
+
+  _enterDvd = () => {
+    if (this._dvd || this._dvdEntering || this._introActive) return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+    this._dvdEntering = true;
+    clearTimeout(this._comboTimer); // pause auto colour change during DVD
+    this._fadeLabels(true);
+    // remember field state, clear background to black
+    this._dvdPrevAnimOn = this._animOn;
+    this._revealTarget = 0;
+    this._bgTarget = { r: 0, g: 0, b: 0 };
+    // ensure title shows "Company"; force-swap if currently "All or Nothing"
+    if (!this._titleAlt) {
+      this._dvdForcedSwap = true;
+      this._titleBusy = true;
+      this._doTitleSwap(true, { sound: false, done: () => this._beginBounce() });
+    } else {
+      this._dvdForcedSwap = false;
+      this._dvdT1 = setTimeout(() => this._beginBounce(), 620);
+    }
+  };
+
+  _beginBounce() {
+    if (!this._dvdEntering) return; // exited mid-transition
+    this._dvdEntering = false;
+    this._dvd = true;
+    this._dvdColorIdx = 0;
+    // constant diagonal velocity (px/s); ratio chosen so corners are rare
+    const speed = 165;
+    const ang = 0.66; // ~38°
+    this._dvx = speed * Math.cos(ang) * (Math.random() < 0.5 ? 1 : -1);
+    this._dvy = speed * Math.sin(ang) * (Math.random() < 0.5 ? 1 : -1);
+    if (this.text) this.text.style.transition = 'none';
+  }
+
+  _exitDvd() {
+    if (!this._dvd && !this._dvdEntering) return;
+    this._dvd = false;
+    this._dvdEntering = false;
+    clearTimeout(this._dvdT1);
+    clearTimeout(this._titleT1); clearTimeout(this._titleT2);
+    // restore background + field
+    const c = this.COMBOS[this.activeCombo];
+    this._bgTarget = this._hex(c.background);
+    if (this._dvdPrevAnimOn) this._revealTarget = this._revealMax;
+    this._resetComboTimer();
+    // bring the corner labels back
+    this._fadeLabels(false);
+    // return the title to centre / restore "All or Nothing" if we forced it
+    const el = this.text;
+    if (this._dvdForcedSwap) {
+      this._dvdForcedSwap = false;
+      this._titleBusy = true;
+      if (el) el.style.transition = 'filter .5s ease, opacity .5s ease';
+      this._doTitleSwap(false, { sound: false, resetPos: true });
+      this._dvdT1 = setTimeout(() => { if (el) el.style.transition = ''; }, 1700);
+    } else if (el) {
+      el.style.transition = 'transform .95s cubic-bezier(.22,.61,.36,1), filter .5s ease, opacity .5s ease';
+      el.style.transform = 'translate(0px,0px)';
+      this._dx = 0; this._dy = 0;
+      this._dvdT1 = setTimeout(() => { if (el) el.style.transition = ''; }, 1000);
+    }
+  }
+
+
+  _openSound() {
+    if (!this.state.soundOn || !this.audio) return;
+    const { ctx, conv } = this.audio;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const vol = this.volume;
+    const out = ctx.createGain(); out.gain.value = 1; out.connect(ctx.destination);
+    if (conv) { const cs = ctx.createGain(); cs.gain.value = 0.4; out.connect(cs); cs.connect(conv); }
+    // two soft rising tones — a gentle "opening / transition" chime
+    [[523.25, 0], [783.99, 0.09]].forEach(([f, t0]) => {
+      const o = ctx.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(f * 0.92, now + t0);
+      o.frequency.exponentialRampToValueAtTime(f, now + t0 + 0.18);
+      const g = ctx.createGain(); g.gain.value = 0;
+      o.connect(g); g.connect(out);
+      g.gain.setValueAtTime(0.0001, now + t0);
+      g.gain.linearRampToValueAtTime(0.08 * vol, now + t0 + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t0 + 0.55);
+      o.start(now + t0); o.stop(now + t0 + 0.6);
+    });
+  }
+
+  linkedinClick = () => {
+    if (this.state.soundOn && !this.audio) { this._initAudio(); this._applyVol(true, false); }
+    this._openSound();
+  };
+
+  companyClick = () => {
+    this._companyFlash = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    if (this.state.soundOn && !this.audio) { this._initAudio(); this._applyVol(true, false); }
+    if (this.companyPulse) {
+      try {
+        this.companyPulse.animate([
+          { transform: 'translate(-50%,50%) scale(0.3)', opacity: 0.5 },
+          { transform: 'translate(-50%,50%) scale(20)', opacity: 0 },
+        ], { duration: 1150, easing: 'cubic-bezier(.22,.61,.36,1)' });
+      } catch (e) {}
+    }
+    this._pulseSound();
+    this._animOn = !this._animOn;
+    this._revealTarget = this._animOn ? this._revealMax : 0;
+  };
+
+  _sebSwap(toArabic, autoReturn) {
+    const el = this.sebText;
+    if (!el) { this._sebBusy = false; return; }
+    this._sebPulse();
+    el.style.filter = 'blur(6px)';
+    el.style.opacity = '0';
+    this._sebT1 = setTimeout(() => {
+      if (toArabic) {
+        el.textContent = '\u0671\u0644\u0635\u0651\u064E\u0628\u0652\u0631\u064E\u0627\u0646\u0650\u064A\u0651';
+        el.style.fontFamily = "'Aref Ruqaa', 'Amiri', serif";
+        el.style.fontWeight = '700';
+        el.style.fontSize = '28px';
+        el.style.letterSpacing = 'normal';
+        el.style.lineHeight = '1';
+      } else {
+        el.textContent = 'SEBRANI';
+        el.style.fontFamily = '';
+        el.style.fontWeight = '';
+        el.style.fontSize = '';
+        el.style.letterSpacing = '';
+        el.style.lineHeight = '';
+      }
+      el.style.filter = 'blur(0px)';
+      el.style.opacity = '1';
+      this._sebArabic = toArabic;
+      this._sebT2 = setTimeout(() => {
+        this._sebBusy = false;
+        // auto-return to Latin after holding the Arabic a moment
+        if (toArabic && autoReturn) {
+          this._sebT3 = setTimeout(() => {
+            if (this._sebArabic && !this._sebBusy) { this._sebBusy = true; this._sebSwap(false, false); }
+          }, 2000);
+        }
+      }, 420);
+    }, 400);
+  }
+
+  sebClick = () => {
+    if (this._sebBusy) return;
+    this._sebBusy = true;
+    clearTimeout(this._sebT3); // cancel any pending auto-return
+    if (this._sebArabic) this._sebSwap(false, false);  // currently Arabic → back to SEBRANI
+    else this._sebSwap(true, true);                    // SEBRANI → Arabic (auto-returns)
+  };
+
+  _toggleSound(on) {
+    if (!this.audio) return;
+    const { ctx, conv } = this.audio;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const vol = Math.max(0.35, this.volume); // audible even at low ambient volume
+    // dedicated chain so the "off" cue is heard even as the bed mutes
+    const out = ctx.createGain(); out.gain.value = 1; out.connect(ctx.destination);
+    if (conv) { const cs = ctx.createGain(); cs.gain.value = 0.35; out.connect(cs); cs.connect(conv); }
+    const o = ctx.createOscillator(); o.type = 'sine';
+    const g = ctx.createGain(); g.gain.value = 0;
+    o.connect(g); g.connect(out);
+    if (on) { o.frequency.setValueAtTime(330, now); o.frequency.exponentialRampToValueAtTime(528, now + 0.16); }
+    else { o.frequency.setValueAtTime(440, now); o.frequency.exponentialRampToValueAtTime(247, now + 0.22); }
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.linearRampToValueAtTime(0.09 * vol, now + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+    o.start(now); o.stop(now + 0.55);
+  }
+
+  toggle = () => {
+    this._soundFlash = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    const on = !this.state.soundOn;
+    this.setState({ soundOn: on });
+    if (!this.audio) this._initAudio();
+    if (on) { this._applyVol(true, false); this._toggleSound(true); }
+    else { this._toggleSound(false); this._applyVol(false, false); }
+  };
+
+  componentWillUnmount() {
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._ro) this._ro.disconnect();
+    window.removeEventListener('pointermove', this._onMove);
+    window.removeEventListener('pointerdown', this._onDown);
+    window.removeEventListener('pointerup', this._onUp);
+    window.removeEventListener('touchmove', this._onTouch);
+    window.removeEventListener('pointermove', this._onIdleMove);
+    window.removeEventListener('pointerdown', this._onActivity);
+    window.removeEventListener('touchstart', this._onActivity);
+    window.removeEventListener('keydown', this._onActivity);
+    window.removeEventListener('wheel', this._onActivity);
+    if (this.root && this._onCtx) this.root.removeEventListener('contextmenu', this._onCtx);
+    clearTimeout(this._sebT1); clearTimeout(this._sebT2); clearTimeout(this._sebT3);
+    clearTimeout(this._comboTimer);
+    clearTimeout(this._introT1); clearTimeout(this._introT2); clearTimeout(this._introT3);
+    clearTimeout(this._titleT1); clearTimeout(this._titleT2);
+    clearTimeout(this._idleTimer); clearTimeout(this._dvdT1);
+    if (this.audio) {
+      try { this.audio.oscs.forEach(o => { try { o.stop(); } catch (e) {} }); } catch (e) {}
+      try { this.audio.ctx.close(); } catch (e) {}
+    }
+  }
+
+  renderVals() {
+    const on = this.state.soundOn;
+    const dotStyle = on
+      ? 'display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent,#fff);'
+      : 'display:inline-block;width:6px;height:6px;border-radius:50%;background:transparent;border:1px solid color-mix(in srgb, var(--accent,#fff) 45%, transparent);';
+    return {
+      rootRef: this.rootRef,
+      canvasRef: this.canvasRef,
+      dotRef: this.dotRef,
+      ringRef: this.ringRef,
+      gaugeRef: this.gaugeRef,
+      gaugeFillRef: this.gaugeFillRef,
+      textRef: this.textRef,
+      sebTextRef: this.sebTextRef,
+      pulseRef: this.pulseRef,
+      soundBtnRef: this.soundBtnRef,
+      sebBtnRef: this.sebBtnRef,
+      companyRef: this.companyRef,
+      linkedinRef: this.linkedinRef,
+      linkedinClick: this.linkedinClick,
+      soundDotRef: this.soundDotRef,
+      companyPulseRef: this.companyPulseRef,
+      companyTextRef: this.companyTextRef,
+      loaderRef: this.loaderRef,
+      loaderLineRef: this.loaderLineRef,
+      titlePulseRef: this.titlePulseRef,
+      titleClick: this.titleClick,
+      sebClick: this.sebClick,
+      companyClick: this.companyClick,
+      toggle: this.toggle,
+      soundLabel: on ? 'Sound On' : 'Sound Off',
+      dotStyle,
+    };
+  }
+}
+</script>
+</body>
+</html>
